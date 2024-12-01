@@ -18,8 +18,8 @@ class Medium:
       self._user_id = creds["medium"]["user_id"]
 
   def _compose_post(self):
-    res = "# " + self._story.title + "\n"
-    res += "## " + self._story.subtitle + "\n"
+    res = "# " + self._story.title + "\n\n"
+    res += self._story.subtitle + "\n"
     res += f"![Image](https://github.com/berryart/willtolife/blob/master/images/{self._story.filename}.webp?raw=true)\n"
     res += self._story.quote + "\n"
     res += self._story.quoteauthor + "\n\n"
@@ -44,7 +44,6 @@ class Medium:
         "title": self._story.title,
         "contentFormat": "markdown",  # Choose 'html', 'markdown', or 'plain'
         "content": self._compose_post(),
-        # "content": "# Hello World3!\nThis is my first article using the Medium API.\n![Image](https://github.com/berryart/willtolife/blob/master/images/inanity_as_cause_of_alcoholism.png?raw=true)",
         "tags": ["sobriety", "recovery", "addiction", "addiction recovery", "alcoholism"],
         "publishStatus": "draft"  # Choose 'public' or 'draft'
     }
