@@ -22,12 +22,14 @@ class Medium:
     res += "## " + self._story.subtitle + "\n"
     res += f"![Image](https://github.com/berryart/willtolife/blob/master/images/{self._story.filename}.webp?raw=true)\n"
     res += self._story.quote + "\n"
-    res += self._story.quoteauthor + "\n"
-    res += self._story.body + "\n"
-    res += self._story.footnote + "\n"
+    res += self._story.quoteauthor + "\n\n"
+    res += self._story.body + "\n\n"
+    res += self._story.footnote + "\n\n"
+    res += "---\n\n"
+    res += "[Will to Life](https://willtolife.org)"
     return res
 
-  def makepost(self, story):
+  def makepost(self):
     headers = {  
         'Authorization': f'Bearer {self._medium_token}',  
         'Content-Type': 'application/json',  
