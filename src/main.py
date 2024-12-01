@@ -12,6 +12,8 @@ if __name__ == "__main__":
 
   # Instagram
   # Make images
-  inst = Instapost(story)
-  inst.makeimages()
+  # inst = Instapost(story)
+  # inst.makeimages()
   # Make post
+  post = PostPublisher(story)
+  post.makepost()

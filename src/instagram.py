@@ -1,13 +1,10 @@
 import json
 from instagrapi import Client
-
-from reader import Story
-
-
 from PIL import Image, ImageDraw, ImageFont
 
 import config
 from reader import Story
+
 
 class Instapost:
   post_size = 1024
@@ -177,21 +174,29 @@ class Instapost:
 
 class PostPublisher:
   def __init__(self, story: Story) -> None:
-    self._story = story
+    self.story = story
 
-
-  def makepost(self, story: Story) -> None:
+  def makepost(self) -> None:
     user = None
     password = None
     with open("credentials.json", "r") as c:
       creds = json.load(c)
       user = creds["instagram"]["user"]
       password = creds["instagram"]["password"]
+
     cl = Client()
     cl.login(user, password)
-    user_id = cl.user_id_from_username('dancing_philosopher')
+    user_id = cl.user_id_from_username(user)
+    tags = "#willtolife #stopdrinking #alcoholfree #addiction #addictionrecovery #recovery #quitdrinking #alcoholic #sobrietybooks #AA #alcoholicsanonymous #12sets #sobrietyquotes #philosophy #psychology #positivepsycology #wisdom #growthmindset #motivation #selfimprovement #strength #spiritualreading #support"
     media = cl.album_upload(
-        ["./instagram/download (1).jpeg", "./instagram/download (2).jpeg"],
-        "Test caption for photo with #hashtags and mention users such @example",
+        [
+          f"{config.Config.dst_image_path}{self.story.filename}_cover.jpeg",
+          f"{config.Config.dst_image_path}{self.story.filename}_quote.jpeg",
+          f"{config.Config.dst_image_path}{self.story.filename}_body.jpeg",
+          f"{config.Config.dst_image_path}prelast_page.jpeg",
+          f"{config.Config.dst_image_path}last_page.jpeg",
+        ],
+        # "Test caption for photo with #hashtags and mention users such @example",
+        self.story.title + "\n" + tags
     )
     print(media)
