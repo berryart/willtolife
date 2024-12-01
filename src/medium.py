@@ -1,37 +1,54 @@
 import requests  
 import json
 
-# Replace these with your actual Medium integration token and file path  
-with open("credentials.json", "r") as c:
-  creds = json.load(c)
-  MEDIUM_TOKEN = creds["medium"]["token"]
-  USER_ID = creds["medium"]["user_id"]
+from reader import Story
 
-headers = {  
-    'Authorization': f'Bearer {MEDIUM_TOKEN}',  
-    'Content-Type': 'application/json',  
-    'Accept': 'application/json',  
-    'host': 'api.medium.com',  
-    'Accept-Charset': 'utf-8'  
-}  
 
-url = f'https://api.medium.com/v1/users/{USER_ID}/posts'
+class Medium:
+  def __init__(self, story: Story) -> None:
+    self._story = story
+    self._medium_token = None
+    self._user_id = None
+    self._get_credentials()
 
-# Article content and metadata
-data = {
-    "title": "Test Image111",
-    "contentFormat": "markdown",  # Choose 'html', 'markdown', or 'plain'
-    # "content": "# Hello World2!\nThis is my first article using the Medium API.\n![Image](files://G:/My%20Drive/Will%20to%20Life/Images/overman_wide.png)",
-    # "content": "# Hello World3!\nThis is my first article using the Medium API.\n![Image](https://drive.google.com/thumbnail?id=1061atDgNRacL1oeiCT8pWmsGeI-xdCuM&sz=w1000)",
+  def _get_credentials(self):
+    with open("credentials.json", "r") as c:
+      creds = json.load(c)
+      self._medium_token = creds["medium"]["token"]
+      self._user_id = creds["medium"]["user_id"]
 
-    "content": "# Hello World3!\nThis is my first article using the Medium API.\n![Image](https://raw.githubusercontent.com/berryart/willtolife/refs/heads/master/images/inanity_as_cause_of_alcoholism.png)",
+  def _compose_post(self):
+    res = "# " + self._story.title + "\n"
+    res += "## " + self._story.subtitle + "\n"
+    res += f"![Image](https://github.com/berryart/willtolife/blob/master/images/{self._story.filename}.webp?raw=true)\n"
+    res += self._story.quote + "\n"
+    res += self._story.quoteauthor + "\n"
+    res += self._story.body + "\n"
+    res += self._story.footnote + "\n"
+    return res
 
-    "tags": ["python", "api", "medium"],
-    "publishStatus": "draft"  # Choose 'public' or 'draft'
-}
+  def makepost(self, story):
+    headers = {  
+        'Authorization': f'Bearer {self._medium_token}',  
+        'Content-Type': 'application/json',  
+        'Accept': 'application/json',  
+        'host': 'api.medium.com',  
+        'Accept-Charset': 'utf-8'  
+    }     
+    url = f'https://api.medium.com/v1/users/{self._user_id}/posts'
 
-# Sending the POST request
-response = requests.post(url=url, headers=headers, data=json.dumps(data))
+    # Article content and metadata
+    data = {
+        "title": self._story.title,
+        "contentFormat": "markdown",  # Choose 'html', 'markdown', or 'plain'
+        "content": self._compose_post(),
+        # "content": "# Hello World3!\nThis is my first article using the Medium API.\n![Image](https://github.com/berryart/willtolife/blob/master/images/inanity_as_cause_of_alcoholism.png?raw=true)",
+        "tags": ["sobriety", "recovery", "addiction", "addiction recovery", "alcoholism"],
+        "publishStatus": "draft"  # Choose 'public' or 'draft'
+    }
 
-print('Status code:', response.status_code)
-print('Response:', response.json())
+    # Sending the POST request
+    response = requests.post(url=url, headers=headers, data=json.dumps(data))
+
+    print('Status code:', response.status_code)
+    print('Response:', response.json())
