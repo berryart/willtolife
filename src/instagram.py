@@ -9,7 +9,7 @@ from reader import Story
 class Instapost:
   post_size = 1024
   badge_height = 650
-  quote_top = 250
+  quote_top = 200
   quote_width = 40
   body_width = 45
   margin = 30
@@ -48,6 +48,7 @@ class Instapost:
         row = ""
     
     res += row
+    res = res.replace("\\", "")
     return res
   
   def _make_body(self):
@@ -193,8 +194,8 @@ class PostPublisher:
           f"{config.Config.dst_image_path}{self.story.filename}_cover.jpeg",
           f"{config.Config.dst_image_path}{self.story.filename}_quote.jpeg",
           f"{config.Config.dst_image_path}{self.story.filename}_body.jpeg",
-          f"{config.Config.dst_image_path}prelast_page.jpeg",
-          f"{config.Config.dst_image_path}last_page.jpeg",
+          f"{config.Config.dst_image_path}prelast_page.jpg",
+          f"{config.Config.dst_image_path}last_page.jpg",
         ],
         # "Test caption for photo with #hashtags and mention users such @example",
         self.story.title + "\n" + tags
