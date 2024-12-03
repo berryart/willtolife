@@ -7,9 +7,9 @@ from instagram import Instapost, PostPublisher
 if __name__ == "__main__":
   rdr = Reader()
   story = rdr.get_story("Meaning in Suffering")
-  # # Medium
-  # mdm = Medium(story)
-  # mdm.makepost()
+  # Medium
+  mdm = Medium(story)
+  mdm.makepost()
 
   # Instagram
   # Make images
@@ -19,6 +19,6 @@ if __name__ == "__main__":
   # post = PostPublisher(story)
   # post.makepost()
 
-  # Reddit
-  rdr = Reddit()
-  text = rdr.makepost(story)
+  # # Reddit
+  # rdr = Reddit()
+  # text = rdr.makepost(story)
