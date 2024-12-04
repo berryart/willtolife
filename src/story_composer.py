@@ -8,6 +8,7 @@ import numpy
 W = 1080
 H = 1920
 S = 0.5
+
 SIZE = (int(W*S), int(H*S))
 FRAME = 0.0
 
