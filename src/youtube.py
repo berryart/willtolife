@@ -1,9 +1,10 @@
 import json
 import os
 import whisper
-from moviepy import ImageClip, TextClip, CompositeVideoClip, AudioFileClip
+from moviepy import ImageClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip
 from moviepy.video.tools.subtitles import SubtitlesClip
 from moviepy.video.fx import Resize, Scroll
+from moviepy.audio.fx import MultiplyVolume
 from PIL import Image
 import math
 import numpy
@@ -125,7 +126,13 @@ class Short:
     return res
   
   def compose(self):
+    music = AudioFileClip("C:/Users/Valued Customer/Downloads/preview.mp3")
+    music = music.with_effects([MultiplyVolume(0.05)])
+
     narration = AudioFileClip(self.narrative_file_path)
+    music = music.subclipped(22.0, 22.0 + narration.duration)
+
+    # narration = narration.with_effects([MultiplyVolume(1.5)])
     images = self._get_image_paths()
     imageclips = [self._zoom_in_effect(i, n) for n, i in enumerate(images)]
 
@@ -143,12 +150,28 @@ class Short:
         text=title_text, 
         font_size=50,
         color="white",
+        bg_color=(0, 0, 0, 100),
         margin=(25, 25, 25, 25)
     )
+    title = title.with_position((0, 100))
     imageclips.append(title)
 
+    subtitle_text = self._wrap_text("Where Self-Acceptance in Recovery Begins", 30)
+    subtitle = TextClip(
+        "./fonts/LibreBaskerville-Regular.ttf", 
+        text=subtitle_text, 
+        font_size=35,
+        color="white",
+        # bg_color=(0, 0, 0, 100),
+        margin=(25, 25, 25, 25)
+    )
+    subtitle = subtitle.with_position((0, 250))
+    imageclips.append(subtitle)
+
     output = CompositeVideoClip(imageclips, size=(W, H))
-    output.audio = narration
+    audio = CompositeAudioClip([music, narration])
+    output.audio = audio
+    # output.audio = narration
     output.duration = narration.duration
     output.write_videofile("./media/amor_fati_as_beginning/short.mp4", fps=30)
 
