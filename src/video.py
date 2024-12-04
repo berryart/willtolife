@@ -56,6 +56,7 @@ def caps(video_path):
   video = VideoFileClip(video_path)
   result = CompositeVideoClip([video, subtitles])
   result.write_videofile("output.mp4")
+  result.audio.write_audiofile("output.mp3")
                        
 if __name__ == "__main__":
     video_path = "C:/Users/Valued Customer/Downloads/video.mp4"

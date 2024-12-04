@@ -163,3 +163,5 @@ cython_debug/
 
 credentials.json
 instagram_posts
+*.mp3
+*.mp4
