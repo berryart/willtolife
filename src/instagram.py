@@ -201,3 +201,28 @@ class PostPublisher:
         self.story.title + "\n" + tags
     )
     print(media)
+
+
+class StoryPublisher:
+  def __init__(self):
+    pass
+
+  def makestory(self):
+    user = None
+    password = None
+    with open("credentials.json", "r") as c:
+      creds = json.load(c)
+      user = creds["instagram"]["user"]
+      password = creds["instagram"]["password"]
+
+    cl = Client()
+    cl.login(user, password)
+    media = cl.video_upload_to_story(
+      "./media/amor_fati_as_beginning/short.mp4"
+    )
+    print(media)
+
+
+if __name__ == "__main__":
+  sp = StoryPublisher()
+  sp.makestory()

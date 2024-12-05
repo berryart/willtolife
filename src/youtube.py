@@ -126,13 +126,13 @@ class Short:
     return res
   
   def compose(self):
-    music = AudioFileClip("C:/Users/Valued Customer/Downloads/preview.mp3")
-    music = music.with_effects([MultiplyVolume(0.05)])
+    music = AudioFileClip("C:/Users/Valued Customer/Downloads/echoofsadness.mp3")
+    music = music.with_effects([MultiplyVolume(0.15)])
 
     narration = AudioFileClip(self.narrative_file_path)
-    music = music.subclipped(22.0, 22.0 + narration.duration)
+    music = music.subclipped(46.0, 46.0 + narration.duration)
+    narration = narration.with_effects([MultiplyVolume(2.0)])
 
-    # narration = narration.with_effects([MultiplyVolume(1.5)])
     images = self._get_image_paths()
     imageclips = [self._zoom_in_effect(i, n) for n, i in enumerate(images)]
 
@@ -162,10 +162,10 @@ class Short:
         text=subtitle_text, 
         font_size=35,
         color="white",
-        # bg_color=(0, 0, 0, 100),
+        bg_color=(0, 0, 0, 50),
         margin=(25, 25, 25, 25)
     )
-    subtitle = subtitle.with_position((0, 250))
+    subtitle = subtitle.with_position((0, 257))
     imageclips.append(subtitle)
 
     output = CompositeVideoClip(imageclips, size=(W, H))
