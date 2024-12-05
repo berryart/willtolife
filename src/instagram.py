@@ -180,7 +180,7 @@ class PostPublisher:
     self.story = story
     self.io = IO(self.story.title)
 
-  def makepost(self) -> None:
+  def publish(self) -> None:
     user = None
     password = None
     with open("credentials.json", "r") as c:
@@ -207,10 +207,11 @@ class PostPublisher:
 
 
 class StoryPublisher:
-  def __init__(self):
-    pass
+  def __init__(self, story: Story) -> None:
+    self.story = story
+    self.io = IO(self.story.title)
 
-  def makestory(self):
+  def publish(self):
     user = None
     password = None
     with open("credentials.json", "r") as c:
@@ -221,11 +222,13 @@ class StoryPublisher:
     cl = Client()
     cl.login(user, password)
     media = cl.video_upload_to_story(
-      "./media/amor_fati_as_beginning/short.mp4"
+      # "./media/amor_fati_as_beginning/short.mp4"
+      str(self.io.short)
     )
     print(media)
+    
 
 
-if __name__ == "__main__":
-  sp = StoryPublisher()
-  sp.makestory()
+# if __name__ == "__main__":
+#   sp = StoryPublisher()
+#   sp.makestory()

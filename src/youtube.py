@@ -4,8 +4,8 @@ from pathlib import Path
 import whisper
 from moviepy import ImageClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip
 from moviepy.video.tools.subtitles import SubtitlesClip
-from moviepy.video.fx import Resize, Scroll
-from moviepy.audio.fx import MultiplyVolume
+from moviepy.video.fx import Resize, FadeOut
+from moviepy.audio.fx import MultiplyVolume, AudioFadeOut
 from PIL import Image
 import math
 import numpy
@@ -143,11 +143,12 @@ class Short:
        return
     
     music = AudioFileClip(Config.music_echoofsaddness)
-    music = music.with_effects([MultiplyVolume(0.15)])
+    music = music.with_effects([MultiplyVolume(0.15), AudioFadeOut(0.5)])
 
     narration = AudioFileClip(self.io.narration)
-    music = music.subclipped(46.0, 46.0 + narration.duration)
+    music = music.subclipped(46.0, 46.0 + narration.duration + 1)
     narration = narration.with_effects([MultiplyVolume(2.0)])
+    narration = narration.with_effects([AudioFadeOut(0.5)])
 
     images = self._get_image_paths()
     imageclips = [self._zoom_in_effect(i, n) for n, i in enumerate(images)]
@@ -184,18 +185,14 @@ class Short:
         bg_color=(0, 0, 0, 50),
         margin=(25, 25, 25, 25)
     )
-    subtitle = subtitle.with_position((0, 257))
+    subtitle = subtitle.with_position((0, 100 + title.size[1]))
     subtitle = subtitle.with_duration(3)
     imageclips.append(subtitle)
 
     output = CompositeVideoClip(imageclips, size=(W, H))
+    output = output.with_effects([FadeOut(1.0)])
     audio = CompositeAudioClip([music, narration])
     output.audio = audio
-    # output.audio = narration
-    output.duration = narration.duration
+    output.duration = narration.duration + 1
     output.write_videofile(self.io.short, fps=30)
 
-# if __name__ == "__main__":
-#   s = Short("./media/amor_fati_as_beginning/narration.mp3")
-#   #  s.generate_captions()
-#   s.compose()
