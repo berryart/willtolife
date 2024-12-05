@@ -11,3 +11,15 @@ class IO:
   @property
   def script(self):
     return self.mediapath.joinpath("script.md")
+  
+  @property
+  def narration(self):
+    return self.mediapath.joinpath("narration.mp3")
+  
+  @property
+  def captions(self):
+    return self.mediapath.joinpath("captions.json")
+
+  @property
+  def short(self):
+    return self.mediapath.joinpath("short.mp4")

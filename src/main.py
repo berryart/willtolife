@@ -1,9 +1,11 @@
+from pathlib import Path
 import sys
 
 from reader import Reader
 from medium import Medium
 from reddit import Reddit
 from instagram import Instapost, PostPublisher
+from youtube import Short
 
 
 if __name__ == "__main__":
@@ -20,15 +22,24 @@ if __name__ == "__main__":
     story = rdr.readscript()
     mdm = Medium(story)
     mdm.makepost()
-
-  # # Instagram
-  # # Make images
-  # inst = Instapost(story)
-  # inst.makeimages()
-  # # Make post
-  # post = PostPublisher(story)
-  # post.makepost()
+  elif engine == "-ic":
+    # Make Instagram images
+    story = rdr.readscript()
+    inst = Instapost(story)
+    inst.makeimages()
+  elif engine == "-ip":
+    # Make post
+    story = rdr.readscript()
+    post = PostPublisher(story)
+    post.makepost()
+  elif engine == "-yc":
+    story = rdr.readscript()
+    short = Short(story)
+    short.generate_captions()
+    short.compose()
 
   # # Reddit
   # rdr = Reddit()
   # text = rdr.makepost(story)
+  else:
+    raise Exception(f"Unknown flag: {engine}")

@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 import whisper
 from moviepy import ImageClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip
 from moviepy.video.tools.subtitles import SubtitlesClip
@@ -9,21 +10,32 @@ from PIL import Image
 import math
 import numpy
 
+from content_io import IO
 from config import Config
+from reader import Story
 
 W = 540
 H = 960
 CLIP_DURATION = 5
 
 class Short:
-  def __init__(self, title):
-    self.narrative_file_path = title
-    self.title = "Amor Fati as Beginning"
+  def __init__(self, story: Story):
+    # self.narrative_file_path = title
+    # self.title = "Amor Fati as Beginning"
+    self.story = story
+    self.io = IO(story.title)
 
   def generate_captions(self):
+    if Path.exists(self.io.captions):
+       print("Captions already exists! Skipping...")
+       return
+    if not Path.exists(self.io.narration):
+       print("Narration is not found!")
+       return
+    
     model = whisper.load_model("base")
     result = model.transcribe(
-      self.narrative_file_path,
+      str(self.io.narration),
       word_timestamps=True,
     )
     
@@ -39,14 +51,14 @@ class Short:
             "end": float(w["end"]),
         })
 
-    with open("data.json", "w") as outfile:
+    with open(self.io.captions, "w") as outfile:
       json.dump(words, outfile)
     
     return words
   
   def _get_image_paths(self):
      contents = os.listdir(Config.src_image_path)
-     return [f"./images/{i}" for i in contents]
+     return [f"{Config.src_image_path}/{i}" for i in contents]
 
   def _zoom_in_effect(self, ipath, n, zoom_ratio=0.04):
     clip = ImageClip(ipath, duration=CLIP_DURATION)
@@ -126,10 +138,14 @@ class Short:
     return res
   
   def compose(self):
-    music = AudioFileClip("C:/Users/Valued Customer/Downloads/echoofsadness.mp3")
+    if not Path.exists(self.io.captions):
+       print(f"Captions not found at: {self.io.captions}")
+       return
+    
+    music = AudioFileClip(Config.music_echoofsaddness)
     music = music.with_effects([MultiplyVolume(0.15)])
 
-    narration = AudioFileClip(self.narrative_file_path)
+    narration = AudioFileClip(self.io.narration)
     music = music.subclipped(46.0, 46.0 + narration.duration)
     narration = narration.with_effects([MultiplyVolume(2.0)])
 
@@ -137,14 +153,15 @@ class Short:
     imageclips = [self._zoom_in_effect(i, n) for n, i in enumerate(images)]
 
     subs = []
-    with open("./media/amor_fati_as_beginning/captions.json", "r", encoding="utf-8") as s:
+    with open(self.io.captions, "r", encoding="utf-8") as s:
         rawsubs = json.load(s)
         for rs in rawsubs:
             subs.append(((rs["start"], rs["end"]), rs["word"]))
     subtitles = SubtitlesClip(subs, make_textclip=self._subgen)
     imageclips.append(subtitles)
 
-    title_text = self._wrap_text(self.title, 17)
+    # Title
+    title_text = self._wrap_text(self.story.title, 17)
     title = TextClip(
         "./fonts/LibreBaskerville-Bold.ttf", 
         text=title_text, 
@@ -154,9 +171,11 @@ class Short:
         margin=(25, 25, 25, 25)
     )
     title = title.with_position((0, 100))
+    title = title.with_duration(3)
     imageclips.append(title)
 
-    subtitle_text = self._wrap_text("Where Self-Acceptance in Recovery Begins", 30)
+    # Subtitle
+    subtitle_text = self._wrap_text(self.story.subtitle, 20)
     subtitle = TextClip(
         "./fonts/LibreBaskerville-Regular.ttf", 
         text=subtitle_text, 
@@ -166,6 +185,7 @@ class Short:
         margin=(25, 25, 25, 25)
     )
     subtitle = subtitle.with_position((0, 257))
+    subtitle = subtitle.with_duration(3)
     imageclips.append(subtitle)
 
     output = CompositeVideoClip(imageclips, size=(W, H))
@@ -173,9 +193,9 @@ class Short:
     output.audio = audio
     # output.audio = narration
     output.duration = narration.duration
-    output.write_videofile("./media/amor_fati_as_beginning/short.mp4", fps=30)
+    output.write_videofile(self.io.short, fps=30)
 
-if __name__ == "__main__":
-  s = Short("./media/amor_fati_as_beginning/narration.mp3")
-  #  s.generate_captions()
-  s.compose()
+# if __name__ == "__main__":
+#   s = Short("./media/amor_fati_as_beginning/narration.mp3")
+#   #  s.generate_captions()
+#   s.compose()

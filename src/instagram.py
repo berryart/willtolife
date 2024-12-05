@@ -3,6 +3,7 @@ from instagrapi import Client
 from PIL import Image, ImageDraw, ImageFont
 
 import config
+from content_io import IO
 from reader import Story
 
 
@@ -27,6 +28,7 @@ class Instapost:
   
   def __init__(self, story: Story) -> None:
     self.story = story
+    self.io = IO(self.story.title)
 
   def makeimages(self):
     self._make_cover()
@@ -79,7 +81,7 @@ class Instapost:
     text_position = (text_x, text_y)
     draw.text(text_position, "(swipe left)", font=font, fill="grey", spacing=Instapost.font_spacing)
 
-    image.save(f"{config.Config.dst_image_path}{self.story.filename}_body.jpeg")
+    image.save(f"{self.io.mediapath}/{self.story.filename}_body.jpeg")
 
   def _make_quote(self):
     image_path = f"{config.Config.src_image_path}{self.story.filename}.webp"
@@ -130,7 +132,7 @@ class Instapost:
     text_position = (text_x, text_y)
     draw.text(text_position, "(swipe left)", font=font, fill="grey", spacing=Instapost.font_spacing)
 
-    image.save(f"{config.Config.dst_image_path}{self.story.filename}_quote.jpeg")
+    image.save(f"{self.io.mediapath}/{self.story.filename}_quote.jpeg")
 
   def _make_cover(self):
     image_path = f"{config.Config.src_image_path}{self.story.filename}.webp"
@@ -170,12 +172,13 @@ class Instapost:
     text_position = (text_x, text_y)
     draw.text(text_position, "(swipe left)", font=title_font, fill="grey")
 
-    image.save(f"{config.Config.dst_image_path}{self.story.filename}_cover.jpeg")
+    image.save(f"{self.io.mediapath}/{self.story.filename}_cover.jpeg")
 
 
 class PostPublisher:
   def __init__(self, story: Story) -> None:
     self.story = story
+    self.io = IO(self.story.title)
 
   def makepost(self) -> None:
     user = None
@@ -188,14 +191,14 @@ class PostPublisher:
     cl = Client()
     cl.login(user, password)
     user_id = cl.user_id_from_username(user)
-    tags = "#willtolife #stopdrinking #alcoholfree #addiction #addictionrecovery #recovery #quitdrinking #alcoholic #sobrietybooks #AA #alcoholicsanonymous #12sets #sobrietyquotes #philosophy #psychology #positivepsycology #wisdom #growthmindset #motivation #selfimprovement #strength #spiritualreading #support"
+    tags = "#vitalistrecovery #vitalism #willtolife #stopdrinking #alcoholfree #addiction #addictionrecovery #recovery #quitdrinking #alcoholic #sobrietybooks #AA #alcoholicsanonymous #12sets #sobrietyquotes #philosophy #psychology #positivepsycology #wisdom #growthmindset #motivation #selfimprovement #strength #spiritualreading #support"
     media = cl.album_upload(
         [
-          f"{config.Config.dst_image_path}{self.story.filename}_cover.jpeg",
-          f"{config.Config.dst_image_path}{self.story.filename}_quote.jpeg",
-          f"{config.Config.dst_image_path}{self.story.filename}_body.jpeg",
-          f"{config.Config.dst_image_path}prelast_page.jpg",
-          f"{config.Config.dst_image_path}last_page.jpg",
+          f"{self.io.mediapath}/{self.story.filename}_cover.jpeg",
+          f"{self.io.mediapath}/{self.story.filename}_quote.jpeg",
+          f"{self.io.mediapath}/{self.story.filename}_body.jpeg",
+          f"{config.Config.media_path}/pre_lastpage.jpeg",
+          f"{config.Config.media_path}/lastpage.jpeg",
         ],
         # "Test caption for photo with #hashtags and mention users such @example",
         self.story.title + "\n" + tags
